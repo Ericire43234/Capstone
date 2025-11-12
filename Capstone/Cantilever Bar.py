@@ -16,8 +16,13 @@ h=1     #Height of the beam in mm
 
 #Solves for moduls of Elasticity
 #%%
-K, l, y, I, E,w,h,n = sp.symbols('K l y I E w h n')
+K, l, y, I, E,w,h,n, phi, theta = sp.symbols('K l y I E w h n phi theta')
 n_num=3
+
+phi = sp.Eq(sp.atan(1/-n), phi)         #5.41
+n=sp.simplify(sp.solve(phi, n)[0])
+phi=theta + sp.pi/2       
+   
 
 if n_num<10 and n_num>.5:
     y=.841655-.0067807*n+.000438*n**2   #5.48
