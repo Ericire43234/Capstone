@@ -1,5 +1,7 @@
 ## Finding the geometry of the pin
 
+# TODO look at this script again to try to fix any errors. Look at where I should use l and where I should use y*l
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -8,11 +10,7 @@ l = 15.1   # mm (beam length)
 w = 1      # mm (beam width)
 h = 1      # mm (beam height)
 n_num = 3  # stiffness ratio
-l_disp = 0.5
-
-# Angle range (radians)
-theta = np.radians(np.linspace(0, 77, 1000))
-angle = np.arccos((l-l_disp)/l)
+disp = 5
 
 # --- Characteristic radius factor (Eq. 5.48 from Howell et al.) ---
 if 0.5 < n_num < 10:
@@ -23,6 +21,10 @@ elif -5 < n_num < 1.8316:
     y = 0.912364 + 0.0145928*n_num
 else:
     raise ValueError("n_num is out of range for y correlation")
+
+# Angle range (radians)
+theta = np.radians(np.linspace(0, 77, 1000))
+angle = np.arctan2(disp,y*l)
 
 # --- PRBM equations for end coordinates ---
 b = l * y * np.sin(theta)                         # vertical deflection
