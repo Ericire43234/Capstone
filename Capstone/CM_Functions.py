@@ -54,3 +54,9 @@ def ctheta(n):
     elif n>=-5 and n<-4:
         c=1.1788
     return c
+
+def mm2in(mm):
+    return mm/25.4
+
+def in2mm(inch):
+    return inch*25.4
