@@ -9,6 +9,7 @@ def calculation():
     r=.1           #Radius of the beam in in
     b=.5            #Deflection of the beam required in in
     phi=135         #Angle of deflection in degrees
+    Sy=60*10**3        #Yield Strength in lb/in^2
 
     n=-1/np.tan(np.radians(phi))
     N=np.sqrt(1+n**2)
@@ -25,9 +26,11 @@ def calculation():
     theta_not=c*theta
     stress_top=(P*a+n*P*b)*(r/2)/(I)-n*P/A
     stress_bottom=-(P*a+n*P*b)*(r/2)/(I)-n*P/A
+    max_stress=max(stress_top, stress_bottom)
     print("Required Force F: ", F, "lb")
-    print("stress at top fiber: ", stress_top, "lb/in^2")
-    print("stress at bottom fiber: ", stress_bottom, "lb/in^2")
+    safety_factor=Sy/max_stress
+    print("Safety Factor: ", safety_factor)
+
 
 
 

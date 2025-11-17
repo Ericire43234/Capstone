@@ -28,13 +28,10 @@ def calculation():
     theta_not=c*theta
     stress_top=-6*(P*a+n*P*b)/(w*h**2)-n*P/A
     stress_bottom=6*(P*a+n*P*b)/(w*h**2)-n*P/A
+    max_stress=max(stress_top, stress_bottom)
     print("Required Force F: ", F, "lb")
-    print("stress at top fiber: ", stress_top, "lb/in^2")
-    print("stress at bottom fiber: ", stress_bottom, "lb/in^2")
-    if abs(stress_top)>=Sy or abs(stress_bottom)>=Sy:
-        print("Stress exceeds Yield Strength!")
-    else:
-        print("Stress is within Yield Strength.")
+    safety_factor=Sy/max_stress
+    print("Safety Factor: ", safety_factor)
 
 
 
