@@ -3,7 +3,7 @@
 # TODO look at this script again to try to fix any errors. Look at where I should use l and where I should use y*l
 
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 
 # --- Inputs ---
 l = 15.1   # mm (beam length)
