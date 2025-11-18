@@ -5,8 +5,8 @@ from CM_Functions import *
 
 def calculation():
     # Inputs
-    E = 0.2*10**6        # Modulus of Elasticity in lb/in^2
-    Sy = 4*10**3         # Yield Strength in lb/in^2
+    E = 0.2e6            # Modulus of Elasticity in lb/in^2
+    Sy = 4e3             # Yield Strength in lb/in^2
     l = mm2in(14/2)      # Length of the beam in in
     w = mm2in(6.5)       # Width of the beam in in
     h = mm2in(1)         # Height of the beam in in
@@ -46,4 +46,6 @@ def calculation():
 
 
 if __name__ == "__main__":
+
+    mats = {}
     calculation()
