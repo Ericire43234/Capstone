@@ -4,12 +4,13 @@ from CM_Functions import *
 
 def calculation():
 #%% Inputs
-    E=30*10**6         #Module of Elasticity in lb/in^2
-    l=20             #Length of the beam in in
-    r=.1           #Radius of the beam in in
-    b=.5            #Deflection of the beam required in in
-    phi=135         #Angle of deflection in degrees
-    Sy=60*10**3        #Yield Strength in lb/in^2
+    E=400000       #Module of Elasticity in lb/in^2
+    Sy=8000        #Yield Strength in lb/in^2
+    l=mm2in(20)             #Length of the beam in in
+    r=mm2in(1)           #Radius of the beam in in
+    b=mm2in(6)            #Deflection of the beam required in in
+    phi=160        #Angle of deflection in degrees
+
 
     n=-1/np.tan(np.radians(phi))
     N=np.sqrt(1+n**2)
