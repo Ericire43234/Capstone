@@ -1,11 +1,14 @@
 #%%Imprts
 import numpy as np
 from CM_Functions import *
+import pandas as pd
 
-def calculation():
+def calculation(E = 4e5, Sy=8e3):
 #%% Inputs
-    E=400000       #Module of Elasticity in lb/in^2
-    Sy=8000        #Yield Strength in lb/in^2
+
+    # Default Inputs
+    # E=400000       #Module of Elasticity in lb/in^2
+    # Sy=8000        #Yield Strength in lb/in^2
     l=mm2in(20)             #Length of the beam in in
     r=mm2in(1)           #Radius of the beam in in
     b=mm2in(6)            #Deflection of the beam required in in
@@ -28,12 +31,31 @@ def calculation():
     stress_top=(P*a+n*P*b)*(r/2)/(I)-n*P/A
     stress_bottom=-(P*a+n*P*b)*(r/2)/(I)-n*P/A
     max_stress=max(stress_top, stress_bottom)
-    print("Required Force F: ", F, "lb")
+    # print("Required Force F: ", F, "lb")
     safety_factor=Sy/max_stress
-    print("Safety Factor: ", safety_factor)
+    # print("Safety Factor: ", safety_factor)
+
+    return safety_factor, F
 
 
 
 
 if __name__ == "__main__":
-    calculation()
+    df = pd.read_excel("BookMaterials.xlsx", skiprows=1)
+    materials = df.iloc[:, 0].to_numpy()      # names
+    Epsi  = df.iloc[:, 1].to_numpy()          # property column 1
+    EPa   = df.iloc[:, 2].to_numpy()
+    Sypsi = df.iloc[:, 3].to_numpy()
+    SyPa  = df.iloc[:, 4].to_numpy()
+
+    material_dict = {
+    name: [p1, p2, p3, p4]
+    for name, p1, p2, p3, p4 in zip(materials, Epsi, EPa, Sypsi, SyPa)
+    }   
+
+    #print(material_dict)
+
+    for key in material_dict:
+        value = material_dict[key]
+        n, F = calculation(value[0],value[2])
+        print(f'{key}: n={n:.2f}, F={F:.2f}lbs')

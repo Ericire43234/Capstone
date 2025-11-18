@@ -9,11 +9,11 @@ def calculation(E = 0.2e6, Sy=60e3):
     # Default Values
     # E=.2*10**6        #Module of Elasticity in lb/in^2
     # Sy=60*10**3       #Yield Strength in lb/in^2
-    l=20             #Length of the beam in in
-    w=1.25           #Width of the beam in in
-    h=1/32            #Height of the beam in in
-    b=10            #Deflection of the beam required in in
-    phi=135         #Angle of deflection in degrees
+    l=mm2in(20)         #Length of the beam in in
+    w=mm2in(3)          #Width of the beam in in
+    h=mm2in(1)          #Height of the beam in in
+    b=mm2in(6)          #Deflection of the beam required in in
+    phi=160             #Angle of deflection in degrees
 
 
     n=-1/np.tan(np.radians(phi))
