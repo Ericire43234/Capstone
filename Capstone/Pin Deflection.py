@@ -6,11 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt # type: ignore
 
 # --- Inputs ---
-l = 15.1   # mm (beam length)
-w = 1      # mm (beam width)
-h = 1      # mm (beam height)
+l = 18   # mm (beam length)
 n_num = 3  # stiffness ratio
-disp = 5
+disp = 8.7
 
 # --- Characteristic radius factor (Eq. 5.48 from Howell et al.) ---
 if 0.5 < n_num < 10:
@@ -42,6 +40,7 @@ plt.ylabel('a (mm) - vertical')
 plt.grid(True)
 # plt.ylim([0,18])
 plt.legend()
+plt.savefig('Estimated Deflection.png')
 plt.show()
 
 print(f"y (characteristic radius factor) = {y:.4f}")
