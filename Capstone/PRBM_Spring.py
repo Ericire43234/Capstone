@@ -37,14 +37,6 @@ def calculation(E = 0.2e6, Sy=4e3):
     theta_not=c*theta
     stress_max = P*a*c/(2*I)
     n = Sy/stress_max
-    # print("Required Force F: ", F, "lb")
-    # print("Maximum Stress: ", stress_max, "lb/in^2")
-    # if abs(stress_max)>=Sy:
-    #     print("Stress exceeds Yield Strength!")
-    #     print(f'Factor of Safety: {n}')
-    # else:
-    #     print("Stress is within Yield Strength.")
-    #     print(f'Factor of Safety: {n}')
 
     return n, F
 
@@ -64,11 +56,26 @@ if __name__ == "__main__":
     for name, p1, p2, p3, p4 in zip(materials, Epsi, EPa, Sypsi, SyPa)
     }   
 
-    #print(material_dict)
+    safe = {}
+    unsafe = {}
 
     for key in material_dict:
         value = material_dict[key]
         n, F = calculation(value[0],value[2])
-        print(f'{key}: n={n:.2f}, F={F:.2f}lbs')
 
-    #calculation()
+        if n < 1:
+            unsafe[key] = [n,F]
+        else:
+            safe[key] = [n,F]
+
+    print("   ")
+    print("Materials that are Unsafe for Use:")
+    for key in unsafe:
+        value = unsafe[key]
+        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
+
+    print("   ")
+    print("Materials that are Safe for Use:")
+    for key in safe:
+        value = safe[key]
+        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')

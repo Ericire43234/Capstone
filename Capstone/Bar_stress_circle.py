@@ -10,9 +10,9 @@ def calculation(E = 4e5, Sy=8e3):
     # E=400000       #Module of Elasticity in lb/in^2
     # Sy=8000        #Yield Strength in lb/in^2
     l=mm2in(20)             #Length of the beam in in
-    r=mm2in(.25)           #Radius of the beam in in
-    b=mm2in(3)            #Deflection of the beam required in in
-    phi=145        #Angle of deflection in degrees
+    r=mm2in(1)           #Radius of the beam in in
+    b=mm2in(6)            #Deflection of the beam required in in
+    phi=160        #Angle of deflection in degrees
 
 
     n=-1/np.tan(np.radians(phi))
@@ -31,9 +31,7 @@ def calculation(E = 4e5, Sy=8e3):
     stress_top=(P*a+n*P*b)*(r/2)/(I)-n*P/A
     stress_bottom=-(P*a+n*P*b)*(r/2)/(I)-n*P/A
     max_stress=max(stress_top, stress_bottom)
-    # print("Required Force F: ", F, "lb")
     safety_factor=Sy/max_stress
-    # print("Safety Factor: ", safety_factor)
 
     return safety_factor, F
 
@@ -53,9 +51,26 @@ if __name__ == "__main__":
     for name, p1, p2, p3, p4 in zip(materials, Epsi, EPa, Sypsi, SyPa)
     }   
 
-    #print(material_dict)
+    safe = {}
+    unsafe = {}
 
     for key in material_dict:
         value = material_dict[key]
         n, F = calculation(value[0],value[2])
-        print(f'{key}: n={n:.2f}, F={F:.2f}lbs')
+
+        if n < 1:
+            unsafe[key] = [n,F]
+        else:
+            safe[key] = [n,F]
+
+    print("   ")
+    print("Materials that are Unsafe for Use:")
+    for key in unsafe:
+        value = unsafe[key]
+        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
+
+    print("   ")
+    print("Materials that are Safe for Use:")
+    for key in safe:
+        value = safe[key]
+        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
