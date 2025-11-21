@@ -35,9 +35,7 @@ def calculation(E = 0.2e6, Sy=60e3):
     stress_top = -6*(P*a+n*P*b)/(w*h**2)-n*P/A
     stress_bottom = 6*(P*a+n*P*b)/(w*h**2)-n*P/A
     max_stress = max(stress_top, stress_bottom)
-    # print("Required Force F: ", F, "lb")
     safety_factor = Sy/max_stress
-    # print("Safety Factor: ", safety_factor)
 
     return safety_factor, F
 
@@ -57,22 +55,17 @@ if __name__ == "__main__":
     for name, p1, p2, p3, p4 in zip(materials, Epsi, EPa, Sypsi, SyPa)
     }   
 
-    #print(material_dict)
-
     safe = {}
     unsafe = {}
 
     for key in material_dict:
         value = material_dict[key]
-        # print(f'{key}: E = {value[0]} psi')
         n, F = calculation(value[0],value[2])
 
         if n < 1:
             unsafe[key] = [n,F]
         else:
             safe[key] = [n,F]
-
-        # print(f'{key}: n={n:.2f}, F={F:.2f}lbs')
 
     print("   ")
     print("Materials that are Unsafe for Use:")
@@ -85,6 +78,3 @@ if __name__ == "__main__":
     for key in safe:
         value = safe[key]
         print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
-
-
-    # calculation()
