@@ -22,7 +22,7 @@ def calculation(E = 0.2e6, Sy=60e3):
     K_theta = Ktheta(n)
 
     # Geometry dependence
-    I = h*w**3/12                             # Moment of Inertia for rectangular cross section
+    I = h*w**3/12    # Moment of Inertia for rectangular cross section
     A = w*h
 
     K = y*K_theta*E*I/l
