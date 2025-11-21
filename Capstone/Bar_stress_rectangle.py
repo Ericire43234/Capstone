@@ -11,7 +11,7 @@ def calculation(E = 0.2e6, Sy=60e3):
     # Sy=60*10**3       #Yield Strength in lb/in^2
     l=mm2in(20)         #Length of the beam in in
     w=mm2in(3)          #Width of the beam in in
-    h=mm2in(1)          #Height of the beam in in
+    h=mm2in(.5)          #Height of the beam in in
     b=mm2in(6)          #Deflection of the beam required in in
     phi=160             #Angle of deflection in degrees
 
@@ -42,7 +42,7 @@ def calculation(E = 0.2e6, Sy=60e3):
 
 if __name__ == "__main__":
 
-    df = pd.read_excel("BookMaterials.xlsx", skiprows=1)
+    df = pd.read_excel("Capstone/BookMaterials.xlsx", skiprows=1)
     materials = df.iloc[:, 0].to_numpy()      # names
     Epsi  = df.iloc[:, 1].to_numpy()          # property column 1
     EPa   = df.iloc[:, 2].to_numpy()
