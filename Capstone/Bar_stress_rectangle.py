@@ -43,7 +43,7 @@ def calculation(E = 0.2e6, Sy=60e3):
 
 if __name__ == "__main__":
 
-    df = pd.read_excel("Capstone/BookMaterials.xlsx", skiprows=1)
+    df = pd.read_excel("BookMaterials.xlsx", skiprows=1)
     materials = df.iloc[:, 0].to_numpy()      # names
     Epsi  = df.iloc[:, 1].to_numpy()          # property column 1
     EPa   = df.iloc[:, 2].to_numpy()

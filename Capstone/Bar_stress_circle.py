@@ -9,9 +9,9 @@ def calculation(E = 4e5, Sy=8e3):
     # Default Inputs
     # E=400000       #Module of Elasticity in lb/in^2
     # Sy=8000        #Yield Strength in lb/in^2
-    l=mm2in(20)             #Length of the beam in in
-    r=mm2in(1)           #Radius of the beam in in
-    b=mm2in(6)            #Deflection of the beam required in in
+    l=mm2in(18)             #Length of the beam in in
+    r=0.005/2            #Radius of the beam in in
+    b=mm2in(8.7)            #Deflection of the beam required in in
     phi=160        #Angle of deflection in degrees
 
 
@@ -39,7 +39,7 @@ def calculation(E = 4e5, Sy=8e3):
 
 
 if __name__ == "__main__":
-    df = pd.read_excel("Capstone/BookMaterials.xlsx", skiprows=1)
+    df = pd.read_excel("BookMaterials.xlsx", skiprows=1)
     materials = df.iloc[:, 0].to_numpy()      # names
     Epsi  = df.iloc[:, 1].to_numpy()          # property column 1
     EPa   = df.iloc[:, 2].to_numpy()
