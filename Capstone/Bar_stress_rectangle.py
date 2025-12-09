@@ -9,10 +9,10 @@ def calculation(E = 0.2e6, Sy=60e3):
     # Default Values
     # E=.2*10**6          # Module of Elasticity in lb/in^2
     # Sy=60*10**3         # Yield Strength in lb/in^2
-    l = mm2in(18)         # Length of the beam in in
+    l = mm2in(18.1)       # Length of the beam in in
     w = mm2in(1.2)        # Width of the beam in in
-    h = mm2in(3)          # Height of the beam in in
-    b = mm2in(8.7)        # Deflection of the beam required in in
+    h = mm2in(4.2)          # Height of the beam in in
+    b = mm2in(10.1)       # Deflection of the beam required in in
     phi = 160             # Angle of deflection in degrees
 
     # Find CM Constants

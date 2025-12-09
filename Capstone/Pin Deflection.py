@@ -6,9 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt # type: ignore
 
 # --- Inputs ---
-l = 18   # mm (beam length)
+l = 18.1   # mm (beam length)
 n_num = 3  # stiffness ratio
-disp = 8.7
+disp = 10.1
 
 # --- Characteristic radius factor (Eq. 5.48 from Howell et al.) ---
 if 0.5 < n_num < 10:
@@ -30,6 +30,9 @@ a = l * (1 - y * (1 - np.cos(theta)))             # horizontal displacement
 
 b0 = l * y * np.sin(angle)                         # vertical deflection
 a0 = l * (1 - y * (1 - np.cos(angle)))             # horizontal displacement
+
+print(f'Horizontal Displacement: {b0} mm')
+print(f'Vertical Displacement: {l-a0} mm')
 
 # --- Plot ---
 plt.figure()
