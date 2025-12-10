@@ -32,8 +32,9 @@ def calculation(E = 4e5, Sy=8e3):
     stress_bottom=-(P*a+n*P*b)*(r/2)/(I)-n*P/A
     max_stress=max(stress_top, stress_bottom)
     safety_factor=Sy/max_stress
+    sig_alt = max_stress/2
 
-    return safety_factor, F
+    return safety_factor, F, sig_alt
 
 
 
@@ -56,21 +57,21 @@ if __name__ == "__main__":
 
     for key in material_dict:
         value = material_dict[key]
-        n, F = calculation(value[0],value[2])
+        n, F, sig_alt = calculation(value[0],value[2])
 
         if n < 1:
-            unsafe[key] = [n,F]
+            unsafe[key] = [n,F, sig_alt]
         else:
-            safe[key] = [n,F]
+            safe[key] = [n,F, sig_alt]
 
     print("   ")
     print("Materials that are Unsafe for Use:")
     for key in unsafe:
         value = unsafe[key]
-        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
+        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs, sig_a={value[2]:.2f}')
 
     print("   ")
     print("Materials that are Safe for Use:")
     for key in safe:
         value = safe[key]
-        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
+        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs, sig_a={value[2]:.2f}')
