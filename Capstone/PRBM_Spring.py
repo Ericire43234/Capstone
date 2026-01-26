@@ -10,10 +10,10 @@ def calculation(E = 0.2e6, Sy=4e3):
     # Default Inputs
     # E = 0.2e6            # Modulus of Elasticity in lb/in^2
     # Sy = 4e3             # Yield Strength in lb/in^2
-    l = mm2in(14/2)      # Length of the beam in in
-    w = mm2in(6.5)       # Width of the beam in in
-    h = mm2in(1)         # Height of the beam in in
-    b = mm2in(0.795/2)   # Deflection of the beam required in in
+    l = mm2in(10)        # Length of the beam in in
+    h = mm2in(4.4)       # Height of the beam in in (Perpendicular to the direction of bending)
+    w = mm2in(1)         # Width of the beam in in  (Parallel to direction of bending - sensitive)
+    b = 0.125/1.5        # Deflection of the beam required in in (currently bit diameter for CNC)
     phi = 90             # Angle of deflection in degrees
 
     # Get values from tabulated data
@@ -23,19 +23,18 @@ def calculation(E = 0.2e6, Sy=4e3):
     K_theta = Ktheta(n)
 
     # Calculate geometry based parameters
-    I = w*h**3/12                             # Moment of Inertia for rectangular cross section
-    A = w*h
+    I = h*w**3/12                             # Moment of Inertia for rectangular cross section
+    A = w*h                                   # Cross sectional area
 
     # Find Stiffness
     K = 2*y*K_theta*E*I/l
-    theta=np.arcsin (b/(y*l))
+    theta=np.arcsin(b/(y*l))
     P=K*theta/(N*y*l*np.sin(np.radians(phi)-theta))
     F=P*N
     a=l*(1-y*(1-np.cos(theta)))
-    ctheta = 0
     c = h/2
-    theta_not=c*theta
-    stress_max = P*a*c/(2*I)
+    # stress_max_vertical = P*a*c/I    # Bending Stress
+    stress_max = abs((P*(a+n*b)*c)/I) - (n*P)/A
     n = Sy/stress_max
 
     return n, F
