@@ -10,8 +10,8 @@ def calculation(E = 0.2e6, Sy=60e3):
     # E=.2*10**6          # Module of Elasticity in lb/in^2
     # Sy=60*10**3         # Yield Strength in lb/in^2
     l = mm2in(19.2)       # Length of the beam in in
-    w = mm2in(0.8)          # Width of the beam in in
-    h = mm2in(2.9)        # Height of the beam in in
+    h = mm2in(0.8)        # Height of the beam in in (Perpendicular to direction of bending. Sensitive parameter)
+    w = mm2in(2.9)        # Width of the beam in in (Parallel to direction of bending. Same as b when calculating I normally)
     b = mm2in(9)          # Deflection of the beam required in in
     phi = 160             # Angle of deflection in degrees
 
@@ -22,7 +22,7 @@ def calculation(E = 0.2e6, Sy=60e3):
     K_theta = Ktheta(n)
 
     # Geometry dependence
-    I = h*w**3/12    # Moment of Inertia for rectangular cross section
+    I = w*h**3/12    # Moment of Inertia for rectangular cross section
     A = w*h
 
     K = y*K_theta*E*I/l

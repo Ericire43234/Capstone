@@ -10,10 +10,10 @@ def calculation(E = 0.2e6, Sy=4e3):
     # Default Inputs
     # E = 0.2e6            # Modulus of Elasticity in lb/in^2
     # Sy = 4e3             # Yield Strength in lb/in^2
-    l = mm2in(10)        # Length of the beam in in
-    h = mm2in(4.4)       # Height of the beam in in (Perpendicular to the direction of bending)
-    w = mm2in(1)         # Width of the beam in in  (Parallel to direction of bending - sensitive)
-    b = 0.125/1.5        # Deflection of the beam required in in (currently bit diameter for CNC)
+    l = mm2in(13.33)     # Length of the beam in in
+    w = mm2in(8.6)       # Width of the beam in in (Parallel to the direction of bending. Same as b when calculating I normally)
+    h = mm2in(1.5)       # Height of the beam in in  (Perpendicular to direction of bending - sensitive)
+    b = mm2in(3.66)      # Deflection of the beam required in in (currently bit diameter for CNC)
     phi = 90             # Angle of deflection in degrees
 
     # Get values from tabulated data
@@ -23,7 +23,7 @@ def calculation(E = 0.2e6, Sy=4e3):
     K_theta = Ktheta(n)
 
     # Calculate geometry based parameters
-    I = h*w**3/12                             # Moment of Inertia for rectangular cross section
+    I = w*h**3/12                             # Moment of Inertia for rectangular cross section
     A = w*h                                   # Cross sectional area
 
     # Find Stiffness
@@ -36,6 +36,13 @@ def calculation(E = 0.2e6, Sy=4e3):
     # stress_max_vertical = P*a*c/I    # Bending Stress
     stress_max = abs((P*(a+n*b)*c)/I) - (n*P)/A
     n = Sy/stress_max
+
+    # Trying equations from CM book page 36
+    M_max = 3*b*E*I/l**2
+    F = M_max/l
+    sigma = 3*b*E*h/(2*l**2)
+
+    n = Sy/sigma
 
     return n, F
 
