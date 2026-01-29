@@ -10,15 +10,16 @@ def calculation(E = 0.2e6, Sy=4e3):
     # Default Inputs
     # E = 0.2e6            # Modulus of Elasticity in lb/in^2
     # Sy = 4e3             # Yield Strength in lb/in^2
-    l = mm2in(13.33)     # Length of the beam in in
-    w = mm2in(8.6)       # Width of the beam in in (Parallel to the direction of bending. Same as b when calculating I normally)
-    h = mm2in(1.5)       # Height of the beam in in  (Perpendicular to direction of bending - sensitive)
-    b = mm2in(3.66)      # Deflection of the beam required in in (currently bit diameter for CNC)
+    l = mm2in(11)        # Length of the beam in in
+    w = mm2in(5.75)      # Width of the beam in in (Parallel to the direction of bending. Same as b when calculating I normally)
+    h = mm2in(1)         # Height of the beam in in  (Perpendicular to direction of bending - sensitive)
+    b = mm2in(2.44)      # Deflection of the beam required in in
+    N = 4                # Number of cantilevers
     phi = 90             # Angle of deflection in degrees
 
     # Get values from tabulated data
     n = -1/np.tan(np.radians(phi))
-    N = np.sqrt(1+n**2)
+    eta = np.sqrt(1+n**2)
     y = gamma(n)   #Calculates n based on angle of deflection
     K_theta = Ktheta(n)
 
@@ -28,21 +29,19 @@ def calculation(E = 0.2e6, Sy=4e3):
 
     # Find Stiffness
     K = 2*y*K_theta*E*I/l
+    k_eff = (N/K)**-1
+
+    # We're saying that the fixed guided beam can be cut into two cantilever beams
+    b = b/2
+
     theta=np.arcsin(b/(y*l))
-    P=K*theta/(N*y*l*np.sin(np.radians(phi)-theta))
-    F=P*N
+    P=k_eff*theta/(eta*y*l*np.sin(np.radians(phi)-theta))
+    F=P*eta
     a=l*(1-y*(1-np.cos(theta)))
     c = h/2
     # stress_max_vertical = P*a*c/I    # Bending Stress
     stress_max = abs((P*(a+n*b)*c)/I) - (n*P)/A
     n = Sy/stress_max
-
-    # Trying equations from CM book page 36
-    M_max = 3*b*E*I/l**2
-    F = M_max/l
-    sigma = 3*b*E*h/(2*l**2)
-
-    n = Sy/sigma
 
     return n, F
 

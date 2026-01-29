@@ -3,7 +3,7 @@ def gamma(n_num):
         y=.841655-.0067807*n_num+.000438*n_num**2   #5.48
     elif n_num<.5 and n_num>-1.8316:
         y=.852144-0.0182867*n_num             
-    elif n_num<1.8316 and n_num>-5:
+    elif n_num<-1.8316 and n_num>-5:
         y=.912364+.0145928*n_num
     return y  
 
