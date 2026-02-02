@@ -37,10 +37,12 @@ def calculation(F = 0.5,E = 0.2e6, Sy=4e3):
     P = F/eta
 
     # Calculate a (horizontal deflection) This equation only works for n=0
-    a = I*stress_max/(P*c)
+    # The two comes from Equation 5.106
+    a = 2*I*stress_max/(P*c)
 
     # Find b (vertical deflection)
     b = np.sqrt((y*l)**2 - a**2)
+    theta_max = np.asin(b/(y*l))
 
     # print((y*l)**2)
     # print(a**2)
@@ -56,7 +58,7 @@ def calculation(F = 0.5,E = 0.2e6, Sy=4e3):
     # stress_max = abs((P*(a+n*b)*c)/I) - (n*P)/A
     # n = Sy/stress_max
 
-    return b
+    return b, np.degrees(theta_max)
 
 
 
@@ -78,16 +80,17 @@ if __name__ == "__main__":
 
     for key in material_dict:
         value = material_dict[key]
-        b = calculation(3,value[0],value[2])
+        b, theta = calculation(0.3479,value[0],value[2])
 
         if(np.isnan(b)):
             continue
         else:
-            deflections[key] = b
+            deflections[key] = b, theta
 
 
     print("   ")
     print("Deflection for Each Material:")
     for key in deflections:
         value = deflections[key]
-        print(f'{key}: b={value:.2f} in or {in2mm(value):.2f} mm')
+        print(f'{key}: b={value[0]:.2f} in or {in2mm(value[0]):.2f} mm')
+        print(f'{key }: theta={value[1]:.2f}')
