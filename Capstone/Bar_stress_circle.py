@@ -11,7 +11,7 @@ def calculation(E = 4e5, Sy=8e3):
     # Sy=8000        #Yield Strength in lb/in^2
     l=mm2in(18)             #Length of the beam in in
     r=0.005/2            #Radius of the beam in in
-    b=mm2in(8.7)            #Deflection of the beam required in in
+    b=mm2in(4)            #Deflection of the beam required in in
     phi=160        #Angle of deflection in degrees
 
 
