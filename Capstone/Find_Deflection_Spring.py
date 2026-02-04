@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt # type: ignore
 from CM_Functions import *
 import pandas as pd
 
-def calculation(E = 0.2e6, Sy=4e3):
+def calculation(F = 0.5,E = 0.2e6, Sy=4e3):
     # Inputs
 
     # Default Inputs
@@ -13,9 +13,9 @@ def calculation(E = 0.2e6, Sy=4e3):
     l = mm2in(11)        # Length of the beam in in
     w = mm2in(5.75)      # Width of the beam in in (Parallel to the direction of bending. Same as b when calculating I normally)
     h = mm2in(1)         # Height of the beam in in  (Perpendicular to direction of bending - sensitive)
-    b = mm2in(2.44)      # Deflection of the beam required in in
     N = 4                # Number of cantilevers
     phi = 90             # Angle of deflection in degrees
+    safety_factor = 1    # Safety Factor
 
     # Get values from tabulated data
     n = -1/np.tan(np.radians(phi))
@@ -26,24 +26,39 @@ def calculation(E = 0.2e6, Sy=4e3):
     # Calculate geometry based parameters
     I = w*h**3/12                             # Moment of Inertia for rectangular cross section
     A = w*h                                   # Cross sectional area
+    c = h/2
 
     # Find Stiffness
     K = 2*y*K_theta*E*I/l
     k_eff = (N/K)**-1
 
-    # We're saying that the fixed guided beam can be cut into two cantilever beams
-    b = b/2
+    # Find the maximum allowable stress
+    stress_max = Sy/safety_factor
+    P = F/eta
 
-    theta=np.arcsin(b/(y*l))
-    P=k_eff*theta/(eta*y*l*np.sin(np.radians(phi)-theta))
-    F=P*eta
-    a=l*(1-y*(1-np.cos(theta)))
-    c = h/2
+    # Calculate a (horizontal deflection) This equation only works for n=0
+    # The two comes from Equation 5.106
+    a = 2*I*stress_max/(P*c)
+
+    # Find b (vertical deflection)
+    b = np.sqrt((y*l)**2 - a**2)
+    theta_max = np.asin(b/(y*l))
+
+    # print((y*l)**2)
+    # print(a**2)
+
+    # # We're saying that the fixed guided beam can be cut into two cantilever beams
+    # b = b/2
+
+    # theta=np.arcsin(b/(y*l))
+    # P=k_eff*theta/(eta*y*l*np.sin(np.radians(phi)-theta))
+    # F=P*eta
+    # a=l*(1-y*(1-np.cos(theta)))
     # stress_max_vertical = P*a*c/I    # Bending Stress
-    stress_max = abs((P*(a+n*b)*c)/I) - (n*P)/A
-    n = Sy/stress_max
+    # stress_max = abs((P*(a+n*b)*c)/I) - (n*P)/A
+    # n = Sy/stress_max
 
-    return n, F
+    return b, np.degrees(theta_max)
 
 
 
@@ -61,26 +76,21 @@ if __name__ == "__main__":
     for name, p1, p2, p3, p4 in zip(materials, Epsi, EPa, Sypsi, SyPa)
     }   
 
-    safe = {}
-    unsafe = {}
+    deflections = {}
 
     for key in material_dict:
         value = material_dict[key]
-        n, F = calculation(value[0],value[2])
+        b, theta = calculation(0.3479,value[0],value[2])
 
-        if n < 1:
-            unsafe[key] = [n,F]
+        if(np.isnan(b)):
+            continue
         else:
-            safe[key] = [n,F]
+            deflections[key] = b, theta
+
 
     print("   ")
-    print("Materials that are Unsafe for Use:")
-    for key in unsafe:
-        value = unsafe[key]
-        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
-
-    print("   ")
-    print("Materials that are Safe for Use:")
-    for key in safe:
-        value = safe[key]
-        print(f'{key}: n={value[0]:.2f}, F={value[1]:.2f}lbs')
+    print("Deflection for Each Material:")
+    for key in deflections:
+        value = deflections[key]
+        print(f'{key}: b={value[0]:.2f} in or {in2mm(value[0]):.2f} mm')
+        print(f'{key }: theta={value[1]:.2f}')
