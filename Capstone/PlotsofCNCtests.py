@@ -2,6 +2,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from pathlib import Path
 import os
+from scipy.signal import find_peaks
+from scipy.stats import linregress
 
 # Get the directory containing the CSV files
 csv_dir = Path(__file__).parent / 'CNC_Delrin_Tests'
@@ -22,10 +24,9 @@ colors = [
     '#8c564b',  # brown
 ]
 
-# Load and plot each CSV file with linear progression
-x_offset = 0
-cycle_boundaries = [0]  # Track where each cycle starts
-
+# Collect max forces for each test
+all_max_forces = []
+prev_cycles = 0  # To keep track of cumulative cycles across tests
 for idx, csv_file in enumerate(csv_files):
     df = pd.read_csv(csv_file, skiprows=2)  # Skip header and units row
     
@@ -34,39 +35,69 @@ for idx, csv_file in enumerate(csv_files):
     
     # Convert to numeric (remove any quotes)
     df['Time'] = pd.to_numeric(df['Time'], errors='coerce')
+    df['Displacement'] = pd.to_numeric(df['Displacement'], errors='coerce')
     df['Force'] = pd.to_numeric(df['Force'], errors='coerce')
     
-    # Extract cycle number from filename
-    cycle_num = idx + 1
+    # Count internal cycles based on force peaks
+    diff = df['Force'].diff()
+    peaks = (diff > 0) & (diff.shift(-1) < 0)
+    num_cycles = peaks.sum()
+    #print(f"{csv_file.name}: {num_cycles} internal cycles")
     
-    # Get the duration of this cycle
-    cycle_duration = df['Time'].max()
+    # Extract max force at each peak
+    max_forces = df.loc[peaks, 'Force'].values
     
-    # Offset the time values for linear progression
-    adjusted_time = df['Time'] + x_offset
+    # Filter out forces below 1 lbf
+    max_forces = max_forces[max_forces >= 1]
     
-    # Add trace for this cycle
+    print("Length of max forces after filtering:", len(max_forces))
+    all_max_forces.append(max_forces)
+
+# Create a figure for max force vs cycle number
+fig = go.Figure()
+
+all_cycles = []
+all_forces = []
+
+for idx, forces in enumerate(all_max_forces):
+    cycles = [i + prev_cycles for i in range(1, len(forces) + 1)]
+    all_cycles.extend(cycles)
+    all_forces.extend(forces)
     fig.add_trace(go.Scatter(
-        x=adjusted_time,
-        y=df['Force'],
-        mode='lines',
-        name=f'Cycle {cycle_num}',
+        x=cycles,
+        y=forces,
+        mode='lines+markers',
+        name=f'Test {idx + 1}',
         line=dict(
             color=colors[idx % len(colors)],
             width=2
         ),
-        hovertemplate='<b>Cycle %{fullData.name}</b><br>Time: %{x:.4f} s<br>Force: %{y:.4f} lbf<extra></extra>'
+        hovertemplate='<b>Test %{fullData.name}</b><br>Cycle: %{x}<br>Max Force: %{y:.4f} lbf<extra></extra>'
     ))
-    
-    # Update offset for next cycle
-    x_offset += cycle_duration
-    cycle_boundaries.append(x_offset)
+    prev_cycles += len(forces)  # Update cumulative cycle count
 
-# Update layout for better interactivity
+# Add linear fit across all data
+slope, intercept, r, p, se = linregress(all_cycles, all_forces)
+fit_line = [slope * x + intercept for x in all_cycles]
+fig.add_trace(go.Scatter(
+    x=all_cycles,
+    y=fit_line,
+    mode='lines',
+    name='Linear Fit',
+    line=dict(color='black', dash='dash', width=3),
+    hovertemplate='Linear Fit: %{y:.4f} lbf<extra></extra>'
+))
+
+print(f"Linear fit: slope = {slope:.6f}, intercept = {intercept:.6f}, r^2 = {r**2:.4f}")
+force_at_100k = slope * 100000 + intercept
+print(f"Predicted max force at 100,000 cycles: {force_at_100k} lbf")
+
+
+# Update layout
 fig.update_layout(
-    title=f'Spring Stress Cycles - Force vs Time (Linear Progression - Total Cycles: {len(csv_files)})',
-    xaxis_title='Cycles (s)',
-    yaxis_title='Force (lbf)',
+    title='Max Force vs Cycle Number Across Tests',
+    xaxis_title='Cycle Number',
+    yaxis_title='Max Force (lbf)',
     hovermode='x unified',
     width=1200,
     height=700,
@@ -79,24 +110,10 @@ fig.update_layout(
     )
 )
 
-# Add vertical lines to mark cycle boundaries
-for i, boundary in enumerate(cycle_boundaries[1:], 1):
-    fig.add_vline(
-        x=boundary,
-        line_dash='dash',
-        line_color='gray',
-        opacity=0.5,
-        annotation_text=f'Cycle {i} → {i+1}',
-        annotation_position='top'
-    )
-
-# Add range slider to see force degradation over time
-fig.update_xaxes(rangeslider_visible=False)
-
 # Show the plot
 fig.show()
 
 # Optionally save the plot
-output_file = Path(__file__).parent / 'CNC_Delrin_Tests_Interactive.html'
+output_file = Path(__file__).parent / 'Max_Force_vs_Cycles_Interactive.html'
 fig.write_html(str(output_file))
 print(f"Interactive plot saved to: {output_file}")
