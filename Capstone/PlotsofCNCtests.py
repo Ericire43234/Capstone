@@ -88,7 +88,27 @@ fig.add_trace(go.Scatter(
     hovertemplate='Linear Fit: %{y:.4f} lbf<extra></extra>'
 ))
 
-print(f"Linear fit: slope = {slope:.6f}, intercept = {intercept:.6f}, r^2 = {r**2:.4f}")
+# Calculate estimated force at 100,000 cycles
+est_100k = slope * 100000 + intercept
+drop = intercept - est_100k
+
+# Add annotation with fit info
+fit_text = f"Slope (per 10k cycles): {slope * 10000:.6f}<br>Intercept: {intercept:.6f}<br>R²: {r**2:.4f}<br>Force at 100k cycles: {est_100k:.2f} lbf<br>Estimated Total drop (0 to 100k): {drop:.2f} lbf"
+fig.add_annotation(
+    text=fit_text,
+    xref="paper", yref="paper",
+    x=0.02, y=0.02,
+    showarrow=False,
+    font=dict(size=12),
+    align="left",
+    bgcolor="white",
+    bordercolor="black",
+    borderwidth=1
+)
+
+print(f"Linear fit: slope (per 10k cycles) = {slope * 10000:.6f}, intercept = {intercept:.6f}, r^2 = {r**2:.4f}")
+print(f"Estimated force at 100,000 cycles: {est_100k:.2f} lbf")
+print(f"Total estimated drop in force (0 to 100k cycles): {drop:.2f} lbf")
 force_at_100k = slope * 100000 + intercept
 print(f"Predicted max force at 100,000 cycles: {force_at_100k} lbf")
 
