@@ -6,7 +6,7 @@ from scipy.signal import find_peaks
 from scipy.stats import linregress
 
 # Get the directory containing the CSV files
-csv_dir = Path(__file__).parent / 'CNC_Delrin_Tests'
+csv_dir = Path(__file__).parent / 'CNC_Delrin_Tests_1_(25k)'
 
 # Find all CSV files in the directory
 csv_files = sorted(csv_dir.glob('*.csv'))
