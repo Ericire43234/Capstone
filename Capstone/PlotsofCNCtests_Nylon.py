@@ -39,19 +39,20 @@ for idx, csv_file in enumerate(csv_files):
     df['Displacement'] = pd.to_numeric(df['Displacement'], errors='coerce')
     df['Force'] = pd.to_numeric(df['Force'], errors='coerce')
     
-    # Count internal cycles based on force peaks
-    diff = df['Force'].diff()
-    peaks = (diff > 0) & (diff.shift(-1) < 0)
-    num_cycles = peaks.sum()
-    #print(f"{csv_file.name}: {num_cycles} internal cycles")
-    
-    # Extract max force at each peak
-    max_forces = df.loc[peaks, 'Force'].values
+    # Count internal cycles and get max force per cycle
+    max_forces = df.groupby('CycleCount')['Force'].max().values
+    #num_cycles = len(max_forces)
+    unique_cycles=sorted(df['CycleCount'].unique())
+    print(f"last {unique_cycles[-1]}")
+    print(f'Prev Cycles: {prev_cycles}')
+    unique_cycles = [cycle+prev_cycles for cycle in unique_cycles] 
+    print(f"last {unique_cycles[-1]}")
+    #print(f"File: {csv_file.name}, Number of cycles: {num_cycles}, Unique cycles: {unique_cycles}")
     
     # Filter out forces below 1 lbf
     max_forces = max_forces[max_forces >= 1]
     
-    print("Length of max forces after filtering:", len(max_forces))
+    #print("Length of max forces after filtering:", len(max_forces))
     all_max_forces.append(max_forces)
 
 # Create a figure for max force vs cycle number
@@ -65,7 +66,7 @@ for idx, forces in enumerate(all_max_forces):
     all_cycles.extend(cycles)
     all_forces.extend(forces)
     fig.add_trace(go.Scatter(
-        x=cycles,
+        x=unique_cycles,
         y=forces,
         mode='lines+markers',
         name=f'Test {idx + 1}',
@@ -75,7 +76,8 @@ for idx, forces in enumerate(all_max_forces):
         ),
         hovertemplate='<b>Test %{fullData.name}</b><br>Cycle: %{x}<br>Max Force: %{y:.4f} lbf<extra></extra>'
     ))
-    prev_cycles += len(forces)  # Update cumulative cycle count
+    prev_cycles += unique_cycles[-1]  # Update cumulative cycle count
+
 
 # Add linear fit across all data
 slope, intercept, r, p, se = linregress(all_cycles, all_forces)
@@ -107,11 +109,11 @@ fig.add_annotation(
     borderwidth=1
 )
 
-print(f"Linear fit: slope (per 10k cycles) = {slope * 10000:.6f}, intercept = {intercept:.6f}, r^2 = {r**2:.4f}")
-print(f"Estimated force at 100,000 cycles: {est_100k:.2f} lbf")
-print(f"Total estimated drop in force (0 to 100k cycles): {drop:.2f} lbf")
+#print(f"Linear fit: slope (per 10k cycles) = {slope * 10000:.6f}, intercept = {intercept:.6f}, r^2 = {r**2:.4f}")
+#print(f"Estimated force at 100,000 cycles: {est_100k:.2f} lbf")
+#print(f"Total estimated drop in force (0 to 100k cycles): {drop:.2f} lbf")
 force_at_100k = slope * 100000 + intercept
-print(f"Predicted max force at 100,000 cycles: {force_at_100k} lbf")
+#print(f"Predicted max force at 100,000 cycles: {force_at_100k} lbf")
 
 
 # Update layout
