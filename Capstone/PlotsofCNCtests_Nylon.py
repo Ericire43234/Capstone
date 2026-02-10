@@ -26,7 +26,8 @@ colors = [
 
 # Collect max forces for each test
 all_max_forces = []
-prev_cycles = 0  # To keep track of cumulative cycles across tests
+prev_cycles = [0]
+unique_cycles = []
 for idx, csv_file in enumerate(csv_files):
     df = pd.read_csv(csv_file, skiprows=8)  # Skip metadata and header rows
     
@@ -42,11 +43,9 @@ for idx, csv_file in enumerate(csv_files):
     # Count internal cycles and get max force per cycle
     max_forces = df.groupby('CycleCount')['Force'].max().values
     #num_cycles = len(max_forces)
-    unique_cycles=sorted(df['CycleCount'].unique())
-    print(f"last {unique_cycles[-1]}")
-    print(f'Prev Cycles: {prev_cycles}')
-    unique_cycles = [cycle+prev_cycles for cycle in unique_cycles] 
-    print(f"last {unique_cycles[-1]}")
+    unique_cycles.append(sorted(df['CycleCount'].unique()))
+
+    #print(f"last {unique_cycles[-1]}")
     #print(f"File: {csv_file.name}, Number of cycles: {num_cycles}, Unique cycles: {unique_cycles}")
     
     # Filter out forces below 1 lbf
@@ -54,6 +53,8 @@ for idx, csv_file in enumerate(csv_files):
     
     #print("Length of max forces after filtering:", len(max_forces))
     all_max_forces.append(max_forces)
+    prev_cycles.append(unique_cycles[-1][-1])  # Update cumulative cycle count
+
 
 # Create a figure for max force vs cycle number
 fig = go.Figure()
@@ -62,11 +63,11 @@ all_cycles = []
 all_forces = []
 
 for idx, forces in enumerate(all_max_forces):
-    cycles = [i + prev_cycles for i in range(1, len(forces) + 1)]
+    cycles = [cycle+prev_cycles[idx] for cycle in unique_cycles[idx]]
     all_cycles.extend(cycles)
     all_forces.extend(forces)
     fig.add_trace(go.Scatter(
-        x=unique_cycles,
+        x=cycles,
         y=forces,
         mode='lines+markers',
         name=f'Test {idx + 1}',
@@ -76,20 +77,23 @@ for idx, forces in enumerate(all_max_forces):
         ),
         hovertemplate='<b>Test %{fullData.name}</b><br>Cycle: %{x}<br>Max Force: %{y:.4f} lbf<extra></extra>'
     ))
-    prev_cycles += unique_cycles[-1]  # Update cumulative cycle count
-
+    
 
 # Add linear fit across all data
-slope, intercept, r, p, se = linregress(all_cycles, all_forces)
-fit_line = [slope * x + intercept for x in all_cycles]
-fig.add_trace(go.Scatter(
-    x=all_cycles,
-    y=fit_line,
-    mode='lines',
-    name='Linear Fit',
-    line=dict(color='black', dash='dash', width=3),
-    hovertemplate='Linear Fit: %{y:.4f} lbf<extra></extra>'
-))
+try:
+    slope, intercept, r, p, se = linregress(all_cycles, all_forces)
+    fit_line = [slope * x + intercept for x in all_cycles]
+    fig.add_trace(go.Scatter(
+        x=all_cycles,
+        y=fit_line,
+        mode='lines',
+        name='Linear Fit',
+        line=dict(color='black', dash='dash', width=3),
+        hovertemplate='Linear Fit: %{y:.4f} lbf<extra></extra>'
+    ))
+except Exception as e:
+    print(f"Error performing linear regression: {e}")
+    slope, intercept, r = 0, 0, 0  # Default values if fit fails
 
 # Calculate estimated force at 100,000 cycles
 est_100k = slope * 100000 + intercept
