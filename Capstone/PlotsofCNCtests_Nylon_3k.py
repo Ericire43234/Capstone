@@ -6,7 +6,7 @@ from scipy.signal import find_peaks
 from scipy.stats import linregress
 
 # Get the directory containing the CSV files
-csv_dir = Path(__file__).parent / 'CNC_Nylon_Tests_1_(100k)'
+csv_dir = Path(__file__).parent / 'CNC_Nylon_Tests_2_(80k)_3k'
 
 # Find all CSV files in the directory
 csv_files = sorted(csv_dir.glob('*.csv'))
@@ -39,9 +39,19 @@ for idx, csv_file in enumerate(csv_files):
     df['Time'] = pd.to_numeric(df['Time'], errors='coerce')
     df['Displacement'] = pd.to_numeric(df['Displacement'], errors='coerce')
     df['Force'] = pd.to_numeric(df['Force'], errors='coerce')
-    
-    # Count internal cycles and get max force per cycle
-    max_forces = df.groupby('CycleCount')['Force'].max().values
+
+    # Smooth force before extracting per-cycle extrema
+    # min_periods=1 avoids NaN values at the edges when center=True
+    df['ForceSmoothed'] = (
+        df['Force']
+        .rolling(window=10, center=True, min_periods=1)
+        .mean()
+    )
+
+    # Count internal cycles and get max force per cycle from smoothed force
+    cycle_max = df.groupby('CycleCount')['ForceSmoothed'].max().values
+    cycle_min = df.groupby('CycleCount')['ForceSmoothed'].min().values
+    max_forces = cycle_max - cycle_min  # Calculate force range for each cycle
     #num_cycles = len(max_forces)
     unique_cycles.append(sorted(df['CycleCount'].unique()))
 
@@ -49,7 +59,7 @@ for idx, csv_file in enumerate(csv_files):
     #print(f"File: {csv_file.name}, Number of cycles: {num_cycles}, Unique cycles: {unique_cycles}")
     
     # Filter out forces below 1 lbf
-    max_forces = max_forces[max_forces >= 1]
+    #max_forces = max_forces[max_forces <= 2.8]
     
     #print("Length of max forces after filtering:", len(max_forces))
     all_max_forces.append(max_forces)
@@ -104,7 +114,9 @@ fit_text = f"Slope (per 10k cycles): {slope * 10000:.6f}<br>Intercept: {intercep
 fig.add_annotation(
     text=fit_text,
     xref="paper", yref="paper",
-    x=0.02, y=0.02,
+    x=0.98, y=0.8,
+    xanchor="right",
+    yanchor="top",
     showarrow=False,
     font=dict(size=12),
     align="left",
@@ -119,10 +131,11 @@ fig.add_annotation(
 force_at_100k = slope * 100000 + intercept
 #print(f"Predicted max force at 100,000 cycles: {force_at_100k} lbf")
 
+csv_file_names = ', '.join([csv_file.name for csv_file in csv_files])
 
 # Update layout
 fig.update_layout(
-    title='Max Force vs Cycle Number Across Tests',
+    title=f'Max Force vs Cycle Number Across Tests<br><sup>{csv_file_names}</sup>',
     xaxis_title='Cycle Number',
     yaxis_title='Max Force (lbf)',
     hovermode='x unified',
