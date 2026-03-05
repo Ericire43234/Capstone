@@ -5,6 +5,22 @@ import os
 from scipy.signal import find_peaks
 from scipy.stats import linregress
 
+
+def save_plot_outputs(fig, output_dir, base_name):
+    output_dir = Path(output_dir)
+    html_file = output_dir / f'{base_name}.html'
+    png_file = output_dir / f'{base_name}.png'
+
+    fig.write_html(str(html_file))
+    print(f"Interactive plot saved to: {html_file}")
+
+    try:
+        fig.write_image(str(png_file), format='png', scale=2)
+        print(f"PNG plot saved to: {png_file}")
+    except Exception as e:
+        print(f"Could not save PNG image: {e}")
+        print("Install kaleido to enable PNG export: pip install kaleido")
+
 # Get the directory containing the CSV files
 csv_dir = Path(__file__).parent / 'CNC_Nylon_Tests_2_(80k)_3k'
 
@@ -118,7 +134,7 @@ fig.add_annotation(
     xanchor="right",
     yanchor="top",
     showarrow=False,
-    font=dict(size=12),
+    font=dict(family='Times New Roman',size=32),
     align="left",
     bgcolor="white",
     bordercolor="black",
@@ -138,6 +154,7 @@ fig.update_layout(
     title=f'Max Force vs Cycle Number Across Tests<br><sup>{csv_file_names}</sup>',
     xaxis_title='Cycle Number',
     yaxis_title='Max Force (lbf)',
+    font=dict(family='Times New Roman',size=32),
     hovermode='x unified',
     width=1200,
     height=700,
@@ -153,7 +170,5 @@ fig.update_layout(
 # Show the plot
 fig.show()
 
-# Optionally save the plot
-output_file = Path(__file__).parent / 'Max_Force_vs_Cycles_Interactive.html'
-fig.write_html(str(output_file))
-print(f"Interactive plot saved to: {output_file}")
+# Save interactive HTML and static PNG
+save_plot_outputs(fig, Path(__file__).parent, 'Max_Force_vs_Cycles_Interactive')
