@@ -8,8 +8,6 @@ def calculation(E = 0.2e6, Sy=4e3):
     # Inputs
 
     # Default Inputs
-    # E = 0.2e6            # Modulus of Elasticity in lb/in^2
-    # Sy = 4e3             # Yield Strength in lb/in^2
     l = mm2in(11)        # Length of the beam in in
     w = mm2in(5.75)      # Width of the beam in in (Parallel to the direction of bending. Same as b when calculating I normally)
     h = mm2in(1)         # Height of the beam in in  (Perpendicular to direction of bending - sensitive)
