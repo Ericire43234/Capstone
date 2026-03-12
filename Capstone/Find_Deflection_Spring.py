@@ -27,6 +27,7 @@ Printed list of safe and unsafe materials with:
     Vertical Deflection
     Angular Deflection
 """
+
 # Imports
 import numpy as np
 import matplotlib.pyplot as plt # type: ignore
