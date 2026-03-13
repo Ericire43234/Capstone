@@ -1,6 +1,6 @@
 
 # Import necessary function from src folder
-from src import SF_Rectangular_Follower, Howell_Consts, utils
+from src import SF_Rectangular_Follower
 import pandas as pd
 
 if __name__ == "__main__":

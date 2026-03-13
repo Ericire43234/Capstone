@@ -1,7 +1,7 @@
 # Imports
 import numpy as np
-from Howell_Consts import *
-from utils import *
+from src.Howell_Consts import *
+from src.utils import *
 
 def SF_Rectangular_Follower(E = 0.2e6, Sy=60e3):
     # Inputs
