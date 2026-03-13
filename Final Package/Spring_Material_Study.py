@@ -1,12 +1,11 @@
 """
-Follower Beam Material Screening Tool
+Compliant Spring Material Screening Tool
 
-This script evaluates candidate materials for a compliant follower with a
+This script evaluates candidate materials for a compliant spring with a
 rectangular cross section. It computes:
 
     • Factor of safety
     • Required input force
-    • Alternating stress
 
 The calculations follow the compliant beam formulations presented in:
 
@@ -27,10 +26,10 @@ Outputs
 Printed list of safe and unsafe materials with:
     safety factor
     required force
-    alternating stress
 """
+
 # Import necessary function from src folder
-from src import SF_Rectangular_Follower
+from src import SF_Spring
 import pandas as pd
 
 if __name__ == "__main__":
@@ -55,13 +54,13 @@ if __name__ == "__main__":
         value = material_dict[key]
 
         # Run beam calculation
-        n, F, sa = SF_Rectangular_Follower(value[0],value[1])
+        n, F = SF_Spring(value[0],value[1])
 
         # Store results based on safety factor
         if n < 1:
-            unsafe[key] = [n,F,sa]
+            unsafe[key] = [n,F]
         else:
-            safe[key] = [n,F,sa]
+            safe[key] = [n,F]
 
     # Print out calculated values based on safety factor
     print("   ")
